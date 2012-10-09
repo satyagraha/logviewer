@@ -37,13 +37,16 @@ There is no reason these could not be further extended to other J2EE containers 
 - Copy the URL in the _Git Read-Only_ entry field at the top of this web page to the clipboard
 - Change working directory to an appropriate location for the checkout, then execute: `git clone url`
 - Change working directory to the newly created _logviewer_ subdirectory
-- Execute either:
- - For Tomcat: `mvn -P tomcat clean tomcat7:run`
- - For Jetty:  `mvn -P jetty clean jetty:run`
-- Open [http://localhost:8080/logviewer/display.html](http://localhost:8080/logviewer/display.html)
-- A web page should be visible in the usual way
+- Ensure you have environment variable `JAVA_HOME` set to reference a Java 6 JDK (not JRE), e.g. on Windows:
+ - `set JAVA_HOME=C:\Program Files\Java\jdk1.6.0_35`
+- For Tomcat, execute:
+ - `mvn -P tomcat clean tomcat7:run`
+- For Jetty, execute:
+  - `mvn -P jetty clean jetty:run`
+- Open web URL [http://localhost:8080/logviewer/display.html](http://localhost:8080/logviewer/display.html)
+- The resulting web page should be visible in the usual way
 - You may configure the base log directory and the log wild-card filename matching via the file
-`/src/main/webapp/WEB-INF/web.xml` by changing the two `init-params` there and re-running the build.
+`/src/main/webapp/WEB-INF/web.xml` by changing the two `init-params` there and re-running the Maven actions.
 
 ### IDE Users
 
