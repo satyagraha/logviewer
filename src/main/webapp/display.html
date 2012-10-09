@@ -1,0 +1,146 @@
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Log File Viewer</title>
+
+<script src="scripts/jquery-1.7.2.js"></script>
+<script src="scripts/jquery.json-2.3.js"></script>
+<script src="scripts/underscore-1.4.1.js"></script>
+
+<script language="javascript" type="text/javascript">
+
+window.LogViewer = {
+		
+	on_ready : function() {
+		// alert('ready')
+		if (typeof(WebSocket) != "function" ) {
+    		$('body').html("<h1>Error</h1><p>Your browser does not support HTML5 Web Sockets.</p>");
+    		return;
+  		}
+		
+		var support_path = '/logviewer/websocket/support';
+		
+		var select = $('#pick_log_file');
+
+		var dir_field = $('#dir_field');
+		
+		var log_area = $('#log_area');
+		
+		var log_area_throttle_ms = 1000;
+		
+		var log_data = "";
+		
+		var log_data_limit = 100000;
+		
+		var pause_btn = $('#pause_btn');
+		
+		var paused = false;
+		
+		var ws_handlers = {
+			
+			websocket : new WebSocket('ws://' + window.location.host + support_path),
+			
+			onopen : function() {
+				// alert('onopen');
+				var get_msg = {
+					action : "GET_LOG_FILENAMES"
+				};
+				this.websocket.send($.toJSON(get_msg));
+			},
+			
+			onmessage : function(event) {
+				// alert('onmessage: ' + event.data);
+				var message = $.evalJSON(event.data);
+				switch (message.action) {
+				case "GOT_LOG_FILENAMES":
+					this.got_log_filenames(message.directory, message.filenames);
+					break;
+				case "LOG_UPDATED":
+					this.log_updated(message.content);
+					break;
+				}
+			},
+			
+			///////////////////////////////////////////////////////////////////
+			
+			got_log_filenames : function(directory, filenames) {
+				// alert('filenames: ' + filenames);
+				$(dir_field).val(directory);
+				filenames.forEach(function (filename) {
+					var html = '<option>_</option>'.replace('_', filename); 
+					$(html).appendTo(select);
+				});
+			},
+			
+			picked_log : function() {
+				var picked = $(select).val();
+				// alert('pick_log: ' + picked);
+				var close_log_msg = {
+					action : "CLOSE_LOG"
+				};
+				this.websocket.send($.toJSON(close_log_msg));
+				if ($(select).children(":first").text() != picked) {
+					log_data = "";
+					log_area.val(log_data);
+					var open_log_msg = {
+						action : "OPEN_LOG",
+						filenames : [picked]
+					};
+					this.websocket.send($.toJSON(open_log_msg));
+				}
+			},
+			
+			log_updated: function(lines) {
+				//alert('log_updated: ' + lines);
+				lines.forEach(function (line) {
+					log_data += line + "\n"; 
+					log_data = log_data.slice(-log_data_limit)
+				});
+				if (!paused) {
+					this.update_text_area();
+				}
+			},
+			
+			update_text_area : _.throttle(function() {
+				log_area.val(log_data);
+				log_area.scrollTop(log_area[0].scrollHeight - log_area.height());
+			}, log_area_throttle_ms),
+			
+			pause_event: function() {
+				paused = $(pause_btn).prop('checked');
+				//alert('pause_event: ' + paused);
+				if (!paused && log_area.val() != log_data) {
+					log_area.val(log_data);
+				}
+			}
+			
+		};
+		_.bindAll(ws_handlers);
+		$.extend(ws_handlers.websocket, ws_handlers);
+		$(select).change(ws_handlers.picked_log);
+		$(pause_btn).change(ws_handlers.pause_event);
+	}
+	
+}
+
+_.bindAll(window.LogViewer);
+
+$(document).ready(window.LogViewer.on_ready);
+	
+</script>
+</head>
+<body>
+    <h1>Log File Viewer</h1>
+	<form>
+	    <input id="dir_field" size="40" readonly="true"/>
+		<select id="pick_log_file"">
+			<option>pick log file</option>
+		</select>
+		<label for="pause_btn">Pause</label><input type="checkbox" id="pause_btn"/>
+	</form>
+	<div style="width: 100%">
+		<textarea id="log_area" style="width: 90%" rows="20" wrap="off" readonly="true">
+		</textarea>
+	</div>
+</body>
+</html>
