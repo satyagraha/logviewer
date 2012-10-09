@@ -2,13 +2,13 @@
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	
 	<display-name>logviewer</display-name>
+	
 	<session-config>
 		<session-timeout>30</session-timeout>
 	</session-config>
-	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>
+	
 	<servlet>
 		<servlet-name>LogViewerServlet</servlet-name>
 		<servlet-class>org.logviewer.servlet.LogViewerServlet</servlet-class>
@@ -25,6 +25,7 @@
 		<servlet-name>LogViewerServlet</servlet-name>
 		<url-pattern>/websocket/support</url-pattern>
 	</servlet-mapping>
+	
 	<context-param>
 		<param-name>executors</param-name>
 		<param-value>20</param-value>

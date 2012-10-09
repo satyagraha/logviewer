@@ -2,7 +2,11 @@ package org.logviewer.core;
 
 import java.util.List;
 
+/**
+ * Encodes communication actions between client and server processes.
+ */
 public class LogMessage {
+    
     enum Action {
         GET_LOG_FILENAMES,
         GOT_LOG_FILENAMES,

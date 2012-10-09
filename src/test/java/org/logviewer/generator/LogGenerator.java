@@ -3,6 +3,9 @@ package org.logviewer.generator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+/**
+ * Simple program to generate log file entries: runs indefinitely until interrupted.
+ */
 public class LogGenerator {
 
     public static void main(String[] args) throws Exception {

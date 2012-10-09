@@ -11,11 +11,17 @@ import javax.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provide an executor usable from web container.
+ */
 public class ExecutorContextListener implements ServletContextListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorContextListener.class);
     
     private ExecutorService executor;
 
+    /**
+     * Create daemon threads as required.
+     */
     private static class DaemonThreadFactory implements ThreadFactory {
 
         private final ThreadFactory factory;

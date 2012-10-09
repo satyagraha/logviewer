@@ -18,6 +18,9 @@ import org.logviewer.core.LogMessage.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides log management capabilities. 
+ */
 public class LogManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
@@ -25,11 +28,22 @@ public class LogManager {
     private final LogSupport logSupport;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Constructor.
+     * 
+     * @param logSupport
+     */
     public LogManager(LogSupport logSupport) {
         LOGGER.debug("LogManager");
         this.logSupport = logSupport;
     }
 
+    /**
+     * Process message as defined by action field.
+     * 
+     * @param messageString
+     * @throws IOException
+     */
     public void handleMessage(String messageString) throws IOException {
         LOGGER.debug("messageString: " + messageString);
         LogMessage message;
@@ -71,6 +85,9 @@ public class LogManager {
         logSupport.sendMessage(mapper.writeValueAsString(response));
     }
 
+    /**
+     * Provides log tailing facilities. 
+     */
     private class LogTailer extends TailerListenerAdapter implements Runnable {
 
         final Tailer tailer;
@@ -86,6 +103,9 @@ public class LogManager {
             tailer.run();
         }
 
+        /* (non-Javadoc)
+         * @see org.apache.commons.io.input.TailerListenerAdapter#handle(java.lang.String)
+         */
         @Override
         public void handle(String line) {
             LOGGER.debug("handle: {}", line);

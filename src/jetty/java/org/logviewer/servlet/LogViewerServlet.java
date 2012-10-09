@@ -13,6 +13,9 @@ import org.logviewer.core.LogSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides servlet for use in Jetty 7.
+ */
 public class LogViewerServlet extends WebSocketServlet {
 
     private static final long serialVersionUID = -1419426879051383553L;
