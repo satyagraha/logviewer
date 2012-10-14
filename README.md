@@ -39,10 +39,14 @@ There is no reason these could not be further extended to other J2EE containers 
 - Change working directory to the newly created _logviewer_ subdirectory
 - Ensure you have environment variable `JAVA_HOME` set to reference a Java 6 JDK (not JRE), e.g. on Windows:
  - `set JAVA_HOME=C:\Program Files\Java\jdk1.6.0_35`
-- For Tomcat, execute:
- - `mvn -P tomcat clean tomcat7:run`
+- Build the complete system thus:
+ - `mvn.bat clean install`
+- Change to the webapp module directory thus:
+ - `cd logviewer-webapp` 
 - For Jetty, execute:
-  - `mvn -P jetty clean jetty:run`
+  - `mvn.bat -P jetty clean jetty:run`
+- For Tomcat, execute:
+ - `mvn.bat -P tomcat clean tomcat7:run`
 - Open web URL [http://localhost:8080/logviewer/display.html](http://localhost:8080/logviewer/display.html)
 - The resulting web page should be visible in the usual way
 - You may configure the base log directory and the log wild-card filename matching via the file
@@ -50,18 +54,7 @@ There is no reason these could not be further extended to other J2EE containers 
 
 ### IDE Users
 
-It is fairly straight-forward to import the Maven project into IDE's like Eclipse: however, there
-are a few points to note. The Maven build is organised around the specification of one of two
-mutually exclusive
-[build profiles](http://maven.apache.org/guides/introduction/introduction-to-profiles.html) , and one
-of these, either `tomcat` or `jetty` must be specified. In Eclipse this can be done via _Project_ &rarr;
-_Properties_ &rarr; _Maven_ and entering the preferred profile in the input field. Also it may be
-desirable to switch off the Java autobuilder and run a Maven `clean verify` build as necessary.
-
-The main problem is that there are two servlet implementations of the same name (`org.logviewer.servlet.LogViewerServlet`),
-one for each container, and this may result in warnings of duplicate classes. However, there should be no
-problem at run-time as long as a `clean` goal is always executed to remove any class files left over from other profile builds.
-Potentially one could have two `web.xml` files, but that is not necessary for this basic implementation.
+TBD.
 
 ## Principles of Operation
  
@@ -90,4 +83,8 @@ happen with a real log file, and is useful during testing.
 
 - Developer contributions welcome.
 
+## Revision History
+
+- 0.0.1 - Initial version
+- 0.0.2 - Split into separate maven modules
   

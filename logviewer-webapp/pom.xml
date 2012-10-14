@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.logviewer</groupId>
 		<artifactId>logviewer</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 	<packaging>war</packaging>
 	<artifactId>logviewer-webapp</artifactId>
@@ -21,7 +21,7 @@
 				<dependency>
 					<groupId>org.logviewer</groupId>
 					<artifactId>logviewer-jetty</artifactId>
-					<version>0.0.1-SNAPSHOT</version>
+					<version>0.0.2-SNAPSHOT</version>
 				</dependency>
 			</dependencies>
 			<build>
@@ -50,7 +50,7 @@
 				<dependency>
 					<groupId>org.logviewer</groupId>
 					<artifactId>logviewer-tomcat</artifactId>
-					<version>0.0.1-SNAPSHOT</version>
+					<version>0.0.2-SNAPSHOT</version>
 				</dependency>
 			</dependencies>
 			<build>
@@ -62,13 +62,6 @@
 						<configuration>
 							<path>/logviewer</path>
 							<warSourceDirectory>${project.build.directory}/webapp</warSourceDirectory>
-							<!-- 
-							<tomcatWebXml>${project.build.directory}/classes/WEB-INF/web.xml</tomcatWebXml>
-							<extraResources>src/main/webapp</extraResources>
-							<tomcatLoggingFile>src/logging.properties</tomcatLoggingFile>
-							 <staticContextDocbase>src/main/webapp</staticContextDocbase>
-							 <staticContextPath>/misc</staticContextPath>
-							 -->
 						</configuration>
 					</plugin>
 				</plugins>
@@ -130,27 +123,6 @@
 	</dependencies>
 
 	<build>
-	<!-- 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<webResources>
-						<webResource>
-							<directory>src/main/webapp/WEB-INF</directory>
-							<includes>
-								<include>*.xml</include>
-							</includes>
-							<targetPath>WEB-INF</targetPath>
-							<filtering>true</filtering>
-						</webResource>
-					</webResources>
-				</configuration>
-			</plugin>
-		</plugins>
-	 -->
-
 		<resources>
 			<resource>
 				<directory>src/main/webapp</directory>
@@ -158,8 +130,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-<!-- 
- -->		
 	</build>
 
 </project>
