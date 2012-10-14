@@ -1,4 +1,4 @@
-package org.logviewer.servlet;
+package org.logviewer.servlet.jetty;
 
 import java.io.File;
 import java.io.IOException;
