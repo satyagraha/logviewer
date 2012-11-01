@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.logviewer.utility.DaemonThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,35 +16,9 @@ import org.slf4j.LoggerFactory;
  * Provide an executor usable from web container.
  */
 public class ExecutorContextListener implements ServletContextListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorContextListener.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(ExecutorContextListener.class);
     
     private ExecutorService executor;
-
-    /**
-     * Create daemon threads as required.
-     */
-    private static class DaemonThreadFactory implements ThreadFactory {
-
-        private final ThreadFactory factory;
-
-        DaemonThreadFactory() {
-            this(Executors.defaultThreadFactory());
-        }
-
-        DaemonThreadFactory(ThreadFactory factory) {
-            if (factory == null)
-                throw new NullPointerException("factory cannot be null");
-            this.factory = factory;
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            LOGGER.debug("newThread");
-            final Thread t = factory.newThread(r);
-            t.setDaemon(true);
-            return t;
-        }
-    }
 
     @Override
     public void contextInitialized(ServletContextEvent arg0) {

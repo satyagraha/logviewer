@@ -6,36 +6,52 @@ import static ch.lambdaj.collection.LambdaCollections.with;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.commons.io.input.Tailer;
-import org.apache.commons.io.input.TailerListenerAdapter;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.logviewer.core.LogMessage.Action;
+import org.logviewer.tailer.LogTailerAbstract;
+import org.logviewer.tailer.LogTailerCommons;
+import org.logviewer.tailer.LogTailerSsh;
+import org.logviewer.tailer.TailerCallback;
+import org.logviewer.tailer.TailerSsh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jcraft.jsch.JSch;
+
 /**
- * Provides log management capabilities. 
+ * Provides log management capabilities.
  */
-public class LogManager {
+public class LogManager implements TailerCallback {
+
+    public static final String LOG_MANAGER_LOG_DIR_KEY = "LogManager.logDir";
+    public static final String LOG_MANAGER_LOG_FILTER_KEY = "LogManager.logFilter";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
-
-    private final LogSupport logSupport;
+    
+    private final LogConfig logConfig;
+    private final MessageSender messageSender;
+    
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Constructor.
      * 
-     * @param logSupport
+     * @param logConfig
+     * @param messageSender
      */
-    public LogManager(LogSupport logSupport) {
+    public LogManager(LogConfig logConfig, MessageSender messageSender) {
         LOGGER.debug("LogManager");
-        this.logSupport = logSupport;
+        this.logConfig = logConfig;
+        this.messageSender = messageSender;
     }
 
     /**
@@ -43,6 +59,7 @@ public class LogManager {
      * 
      * @param messageString
      * @throws IOException
+     * @throws URISyntaxException
      */
     public void handleMessage(String messageString) throws IOException {
         LOGGER.debug("messageString: " + messageString);
@@ -55,11 +72,17 @@ public class LogManager {
         }
         LOGGER.debug("message.action: " + message.action);
         switch (message.action) {
+        case PING_SERVER:
+            pongClient();
+            break;
         case GET_LOG_FILENAMES:
             getLogFilenames();
             break;
-        case OPEN_LOG:
-            openLog(message.filenames.get(0));
+        case OPEN_LOG_LOCAL:
+            openLogLocal(message.filenames.get(0));
+            break;
+        case OPEN_LOG_REMOTE:
+            openLogRemote(message.filenames.get(0), message.password, message.passphrase);
             break;
         case CLOSE_LOG:
             closeLog();
@@ -69,81 +92,127 @@ public class LogManager {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.logviewer.core.TailerCallback#handleLine(java.lang.String)
+     */
+    @Override
+    public void handleLine(String line) {
+        LOGGER.debug("handleLine: {}", line);
+        sendLine(line);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.logviewer.core.TailerCallback#handleException(java.lang.Exception)
+     */
+    @Override
+    public void handleException(Exception e) {
+        LOGGER.debug("handleException", e);
+        sendLine(String.format("[%s]", e.getMessage()));
+        // tailer.stop();
+    }
+
+    private void pongClient() throws IOException {
+        LOGGER.debug("pongClient");
+
+        LogMessage response = new LogMessage();
+        response.action = Action.PONG_CLIENT;
+        messageSender.sendMessage(mapper.writeValueAsString(response));
+    }
+
     private void getLogFilenames() throws IOException {
         LOGGER.debug("getLogFilenames");
-        
-        File logDir = logSupport.getLogDir();
-        FileFilter fileFilter = new WildcardFileFilter(logSupport.getLogFilter());
+
+        File logDir = getLogDir();
+        FileFilter fileFilter = getLogFilter();
         File[] files = logDir.listFiles(fileFilter);
         List<String> filenames = with(files).extract(on(File.class).getName()).sort(on(String.class).toLowerCase());
         LOGGER.debug("filenames: {}", filenames);
-        
+
         LogMessage response = new LogMessage();
         response.action = Action.GOT_LOG_FILENAMES;
         response.directory = logDir.getAbsolutePath();
         response.filenames = filenames;
-        logSupport.sendMessage(mapper.writeValueAsString(response));
+        messageSender.sendMessage(mapper.writeValueAsString(response));
     }
 
-    /**
-     * Provides log tailing facilities. 
-     */
-    private class LogTailer extends TailerListenerAdapter implements Runnable {
+    private File getLogDir() {
+        String logDir = logConfig.getProperties().getProperty(LOG_MANAGER_LOG_DIR_KEY);
+        return new File(logDir);
+    }
+    
+    private WildcardFileFilter getLogFilter() {
+        String logFilter = logConfig.getProperties().getProperty(LOG_MANAGER_LOG_FILTER_KEY);
+        return new WildcardFileFilter(logFilter);
+    }
+    
+    private LogTailerAbstract logTailer;
 
-        final Tailer tailer;
+    private void openLogLocal(String filename) throws IOException {
+        LOGGER.debug("filename: {}", filename);
 
-        LogTailer(File file) {
-            LOGGER.debug("LogTailer: {}", file);
-            tailer = new Tailer(file, this);
+        File file = new File(getLogDir(), filename);
+        URI uri;
+        try {
+             uri = new URI("file", "///" + file.getAbsolutePath(), null);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
         }
+        LOGGER.debug("uri: {}", uri);
 
-        @Override
-        public void run() {
-            LOGGER.debug("LogTailer.run");
-            tailer.run();
-        }
+        logTailer = new LogTailerCommons(this, uri, logConfig.getExecutor());
+        logTailer.start();
+    }
 
-        /* (non-Javadoc)
-         * @see org.apache.commons.io.input.TailerListenerAdapter#handle(java.lang.String)
-         */
-        @Override
-        public void handle(String line) {
-            LOGGER.debug("handle: {}", line);
-            
-            LogMessage response = new LogMessage();
-            response.action = Action.LOG_UPDATED;
-            response.content = Arrays.asList(line);
-            
-            try {
-                logSupport.sendMessage(mapper.writeValueAsString(response));
-            } catch (IOException e) {
-                LOGGER.debug("exception", e);
-                throw new RuntimeException(e);
-            }
-        }
+    private void openLogRemote(String uri_string, String password, String passphrase) throws IOException {
+        LOGGER.debug("uri_string: {}", uri_string);
         
-        @Override
-        public void handle(Exception e) {
-            LOGGER.debug("handle", e);
-            tailer.stop();
+        URI uri;
+        try {
+            uri = new URI(uri_string);
+        } catch (URISyntaxException e) {
+            handleException(e);
+            throw new IOException(e);
         }
+        LOGGER.debug("uri: {}", uri);
+        
+        Properties properties = new Properties(logConfig.getProperties());
+        if (StringUtils.isNotEmpty(password)) {
+            properties.put(LogTailerSsh.LOG_TAILER_SSH_PASSWORD_KEY, password);
+        }
+        if (StringUtils.isNotEmpty(passphrase)) {
+            properties.put(LogTailerSsh.LOG_TAILER_SSH_PASSPHRASE_KEY, passphrase);
+        }
+
+        JSch jsch = new JSch();
+        TailerSsh tailer = new TailerSsh(jsch, uri, this, logConfig.getExecutor());
+        logTailer = new LogTailerSsh(this, uri, logConfig.getExecutor(), properties, tailer);
+        logTailer.start();
     }
-
-    private LogTailer logTailer;
-
-    private void openLog(String filename) throws IOException {
-        LOGGER.debug("openLog: {}", filename);
-
-        logTailer = new LogTailer(new File(logSupport.getLogDir(), filename));
-        logSupport.getExecutor().execute(logTailer);
-    }
-
+    
     private void closeLog() {
         LOGGER.debug("closeLog");
         if (logTailer != null) {
-            logTailer.tailer.stop();
+            logTailer.stop();
         }
         logTailer = null;
+    }
+
+    private void sendLine(String line) {
+        LogMessage response = new LogMessage();
+        response.action = Action.LOG_UPDATED;
+        response.content = Arrays.asList(line);
+
+        try {
+            messageSender.sendMessage(mapper.writeValueAsString(response));
+        } catch (IOException e) {
+            LOGGER.debug("exception", e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

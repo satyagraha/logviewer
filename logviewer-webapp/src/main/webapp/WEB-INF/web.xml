@@ -12,14 +12,6 @@
 	<servlet>
 		<servlet-name>LogViewerServlet</servlet-name>
 		<servlet-class>org.logviewer.servlet.${container.name}.LogViewerServlet</servlet-class>
-		<init-param>
-			<param-name>logDir</param-name>
-			<param-value>C:/temp</param-value>
-		</init-param>
-		<init-param>
-			<param-name>logFilter</param-name>
-			<param-value>*.log</param-value>
-		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>LogViewerServlet</servlet-name>

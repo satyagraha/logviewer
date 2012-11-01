@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.logviewer</groupId>
 		<artifactId>logviewer</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	<packaging>war</packaging>
 	<artifactId>logviewer-webapp</artifactId>
@@ -21,7 +21,7 @@
 				<dependency>
 					<groupId>org.logviewer</groupId>
 					<artifactId>logviewer-jetty</artifactId>
-					<version>0.0.2-SNAPSHOT</version>
+					<version>0.0.3-SNAPSHOT</version>
 				</dependency>
 			</dependencies>
 			<build>
@@ -50,7 +50,7 @@
 				<dependency>
 					<groupId>org.logviewer</groupId>
 					<artifactId>logviewer-tomcat</artifactId>
-					<version>0.0.2-SNAPSHOT</version>
+					<version>0.0.3-SNAPSHOT</version>
 				</dependency>
 			</dependencies>
 			<build>
@@ -71,6 +71,12 @@
 	</profiles>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.logviewer</groupId>
+			<artifactId>logviewer-common</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

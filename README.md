@@ -4,7 +4,8 @@
 
 This project provides a capability to tail log files in a web browser. It uses the emerging 
 [websockets](http://en.wikipedia.org/wiki/WebSocket) technology to stream new log lines to the browser for 
-display in a scrollable text area.
+display in a scrollable text area. The log files tailed may be either on a filesystem locally mounted on 
+the web application server, or be remotely accessible via ssh.
 
 ### Browser Compatibility
 
@@ -37,6 +38,8 @@ There is no reason these could not be further extended to other J2EE containers 
 - Copy the URL in the _Git Read-Only_ entry field at the top of this web page to the clipboard
 - Change working directory to an appropriate location for the checkout, then execute: `git clone url`
 - Change working directory to the newly created _logviewer_ subdirectory
+- Edit the file `logviewer-common/src/main/resources/LogConfigDefault.properties` to adjust log
+directory if required
 - Ensure you have environment variable `JAVA_HOME` set to reference a Java 6 JDK (not JRE), e.g. on Windows:
  - `set JAVA_HOME=C:\Program Files\Java\jdk1.6.0_35`
 - Build the complete system thus:
@@ -49,13 +52,37 @@ There is no reason these could not be further extended to other J2EE containers 
  - `mvn.bat -P tomcat clean tomcat7:run`
 - Open web URL [http://localhost:8080/logviewer/display.html](http://localhost:8080/logviewer/display.html)
 - The resulting web page should be visible in the usual way
-- You may configure the base log directory and the log wild-card filename matching via the file
-`/src/main/webapp/WEB-INF/web.xml` by changing the two `init-params` there and re-running the Maven actions.
+
+### Tailing Server-local Files
+
+Click the _pick log File_ pulldown to select a file to be tailed. 
+
+### Tailing Server-remote Files
+
+- Enter a URI in the entry field, typically in the form: `ssh://userid@hostname/path/to/file`
+- Note that URI's need to be URL-encoded for embedded spaces or other special characters
+- If using password authentication, add a password in the appropriate entry field
+- If using passphrase authentication, add a passphrase in the appropriate entry field
+- Click the _Tail_ button
+- Defaults for various ssh parameters may be set via the properties file mentioned above
 
 ### IDE Users
 
-TBD.
+Note that, at the time of writing, the standard Eclipse Maven plugin _m2e_ has an issue whereby
+source code cannot be found when debugging with the above Jetty/Tomcat7 run configuratations: this
+is due to dynamic code loading, see the [bug report](https://bugs.eclipse.org/bugs/show_bug.cgi?id=384065).
+As an interim fix, an additional _m2e_ extension plugin may be installed from
+[here](https://github.com/ifedorenko/com.ifedorenko.m2e.sourcelookup) which provides the currently
+missing functionality. 
+ 
+### Javadoc
 
+Execution of the command:
+
+- `mvn.bat javadoc:javadoc`
+
+at base directory level will result in Javadoc being created under `javadoc/site/apidocs`. 
+ 
 ## Principles of Operation
  
 Communication between client- and server-side is very simple, using one JSON-encoded object, declared as a `LogMessage`
@@ -76,15 +103,28 @@ to perform the tracking of the log file.
 A simple implementation of the standard Java [Executor](http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/Executor.html)
 interface is provided to manage the necessary thread pool.
 
-A utility main program class named `LogGenerator` is provided, it writes to a log file on a regular basis to simulate what would
-happen with a real log file, and is useful during testing.
+## Log Generator
+
+A utility program named `LogGenerator` is provided: it writes to a log file on a regular basis to simulate what
+would happen with a real log file, and is useful during testing. The log file location is configured in
+`logviewer-common/src/main/resources/generator.log4j.properties`.
+
+To run the generator, from the main working directory do the following:
+
+ - `set JAVA_HOME=C:\Program Files\Java\jdk1.6.0_35`
+ - `cd logviewer-common`
+ - `mvn.bat -P generator exec:java -Dexec.args=100`
+
+which generates 100 lines of output then exits. Omit the line limit number to make the program run indefinitely.
 
 ## Notes
 
-- Developer contributions welcome.
+- Developer contributions welcome
+- Credit is due to JCraft Inc, developers of the [Jsch Java SSH library](http://www.jcraft.com/jsch/)
 
 ## Revision History
 
-- 0.0.1 - Initial version
+- 0.0.3 - Added ssh support
 - 0.0.2 - Split into separate maven modules
+- 0.0.1 - Initial version
   

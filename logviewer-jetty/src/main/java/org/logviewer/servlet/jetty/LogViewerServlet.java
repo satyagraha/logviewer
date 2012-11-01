@@ -1,15 +1,15 @@
 package org.logviewer.servlet.jetty;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketServlet;
+import org.logviewer.core.LogConfig;
 import org.logviewer.core.LogManager;
-import org.logviewer.core.LogSupport;
+import org.logviewer.core.MessageSender;
+import org.logviewer.servlet.LogConfigDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +21,12 @@ public class LogViewerServlet extends WebSocketServlet {
     private static final long serialVersionUID = -1419426879051383553L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogViewerServlet.class);
+    
+    private final LogConfig logConfig = new LogConfigDefault(this);
 
-    private class LogMessageWebSocket implements WebSocket, WebSocket.OnTextMessage, LogSupport {
+    private class LogMessageWebSocket implements WebSocket, WebSocket.OnTextMessage, MessageSender {
 
-        private final LogManager logManager = new LogManager(this);
+        private final LogManager logManager = new LogManager(logConfig, this);
         private WebSocket.Connection connection;
         
         @Override
@@ -53,29 +55,11 @@ public class LogViewerServlet extends WebSocketServlet {
         ///////////////////////////////////////////////////////////////////////
         
         @Override
-        public java.io.File getLogDir() {
-            String logDir = getServletConfig().getInitParameter("logDir");
-            LOGGER.debug("logDir: {}", logDir);
-            return new File(logDir);
-        };
-        
-        @Override
-        public String getLogFilter() {
-            String logFilter = getServletConfig().getInitParameter("logFilter");
-            LOGGER.debug("logFilter: {}", logFilter);
-            return logFilter;
-        }
-        
-        @Override
         public void sendMessage(String messageString) throws IOException {
             LOGGER.debug("sending message: {}", messageString);
             connection.sendMessage(messageString);
         }
 
-        @Override
-        public Executor getExecutor() {
-            return (Executor) getServletContext().getAttribute("executor");
-        }
     };
 
     @Override

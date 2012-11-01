@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.logviewer</groupId>
 		<artifactId>logviewer</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>logviewer-common</artifactId>
 	<packaging>jar</packaging>
@@ -34,6 +34,16 @@
 			<version>2.4</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.49</version>
+		</dependency>
+		<dependency>
 			<groupId>com.googlecode.lambdaj</groupId>
 			<artifactId>lambdaj</artifactId>
 			<version>2.3.3</version>
@@ -60,5 +70,23 @@
 		</dependency>
 
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>generator</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.2.1</version>
+						<configuration>
+							<mainClass>org.logviewer.generator.LogGenerator</mainClass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

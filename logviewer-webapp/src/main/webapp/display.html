@@ -24,6 +24,14 @@ window.LogViewer = {
 
 		var dir_field = $('#dir_field');
 		
+		var remote_field = $('#remote_field');
+		
+		var password_field = $('#password_field');
+		
+		var passphrase_field = $('#passphrase_field');
+		
+		var remote_btn = $('#remote_btn');
+		
 		var log_area = $('#log_area');
 		
 		var log_area_throttle_ms = 1000;
@@ -31,6 +39,8 @@ window.LogViewer = {
 		var log_data = "";
 		
 		var log_data_limit = 100000;
+		
+		var keep_alive_ms = 60000;
 		
 		var pause_btn = $('#pause_btn');
 		
@@ -42,6 +52,8 @@ window.LogViewer = {
 			
 			onopen : function() {
 				// alert('onopen');
+				this.ping_server();
+				
 				var get_msg = {
 					action : "GET_LOG_FILENAMES"
 				};
@@ -52,16 +64,29 @@ window.LogViewer = {
 				// alert('onmessage: ' + event.data);
 				var message = $.evalJSON(event.data);
 				switch (message.action) {
+				case "PONG_CLIENT":
+					var timer_id = setTimeout(this.ping_server, keep_alive_ms);
+					break;
 				case "GOT_LOG_FILENAMES":
 					this.got_log_filenames(message.directory, message.filenames);
 					break;
 				case "LOG_UPDATED":
 					this.log_updated(message.content);
 					break;
+				default:
+					// alert('unexpected action: ' + message.action);
 				}
 			},
 			
 			///////////////////////////////////////////////////////////////////
+			
+			ping_server : function() {
+				// alert('ping_server');
+				var ping_server_msg = {
+					action : "PING_SERVER"
+				};
+				this.websocket.send($.toJSON(ping_server_msg));
+			},
 			
 			got_log_filenames : function(directory, filenames) {
 				// alert('filenames: ' + filenames);
@@ -72,22 +97,41 @@ window.LogViewer = {
 				});
 			},
 			
-			picked_log : function() {
+			picked_local : function() {
+				this.send_close();
 				var picked = $(select).val();
-				// alert('pick_log: ' + picked);
-				var close_log_msg = {
-					action : "CLOSE_LOG"
-				};
-				this.websocket.send($.toJSON(close_log_msg));
+				// alert('picked_local: ' + picked);
 				if ($(select).children(":first").text() != picked) {
 					log_data = "";
 					log_area.val(log_data);
 					var open_log_msg = {
-						action : "OPEN_LOG",
+						action : "OPEN_LOG_LOCAL",
 						filenames : [picked]
 					};
 					this.websocket.send($.toJSON(open_log_msg));
 				}
+			},
+			
+			picked_remote : function() {
+				this.send_close();
+				var remote_uri = $.trim($(remote_field).val());
+				// alert('picked_remote: ' + remote_uri);
+				if (remote_uri != "") {
+				    var open_log_msg = {
+			    	    action : "OPEN_LOG_REMOTE",
+			    	    filenames : [remote_uri],
+       					password : $(password_field).val(),
+       					passphrase : $(passphrase_field).val()
+				    };
+				    this.websocket.send($.toJSON(open_log_msg));
+				}
+			},
+
+			send_close: function() {
+				var close_log_msg = {
+						action : "CLOSE_LOG"
+					};
+				this.websocket.send($.toJSON(close_log_msg));
 			},
 			
 			log_updated: function(lines) {
@@ -117,7 +161,8 @@ window.LogViewer = {
 		};
 		_.bindAll(ws_handlers);
 		$.extend(ws_handlers.websocket, ws_handlers);
-		$(select).change(ws_handlers.picked_log);
+		$(select).change(ws_handlers.picked_local);
+		$(remote_btn).click(ws_handlers.picked_remote);
 		$(pause_btn).change(ws_handlers.pause_event);
 	}
 	
@@ -132,14 +177,28 @@ $(document).ready(window.LogViewer.on_ready);
 <body>
     <h1>Log File Viewer</h1>
 	<form>
-	    <input id="dir_field" size="40" readonly="true"/>
-		<select id="pick_log_file"">
-			<option>pick log file</option>
-		</select>
+		<fieldset>
+			<legend><b>Local</b></legend>
+			<label for="dir_field">Log Dir:</label>
+	    	<input id="dir_field" size="40" readonly="true"/>
+			<select id="pick_log_file"">
+				<option>pick log file</option>
+			</select>
+		</fieldset>
+		<fieldset>
+			<legend><b>Remote</b></legend>
+			<label for="remote_field">Ssh Uri:</label>
+	    	<input id="remote_field" size="60"/>
+			<label for="password_field">Password:</label>
+	    	<input id="password_field" size="40" type="password"/>
+			<label for="passphrase_field">Passphrase:</label>
+	    	<input id="passphrase_field" size="40" type="password"/>
+	    	<button id="remote_btn" type="button">Tail</button>
+		</fieldset>
 		<label for="pause_btn">Pause</label><input type="checkbox" id="pause_btn"/>
 	</form>
 	<div style="width: 100%">
-		<textarea id="log_area" style="width: 90%" rows="20" wrap="off" readonly="true">
+		<textarea id="log_area" style="width: 100%" rows="20" wrap="off" readonly="true">
 		</textarea>
 	</div>
 </body>
