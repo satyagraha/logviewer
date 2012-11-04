@@ -50,7 +50,7 @@ window.LogViewer = {
 			
 			websocket : new WebSocket('ws://' + window.location.host + support_path),
 			
-			onopen : function() {
+			onopen : function(event) {
 				// alert('onopen');
 				this.ping_server();
 				
@@ -78,6 +78,11 @@ window.LogViewer = {
 				}
 			},
 			
+			onclose: function(event) {
+                //alert('onclose');
+                this.log_updated(['[connection closed]']);
+			},
+			
 			///////////////////////////////////////////////////////////////////
 			
 			ping_server : function() {
@@ -102,8 +107,7 @@ window.LogViewer = {
 				var picked = $(select).val();
 				// alert('picked_local: ' + picked);
 				if ($(select).children(":first").text() != picked) {
-					log_data = "";
-					log_area.val(log_data);
+					this.clear_text_area();
 					var open_log_msg = {
 						action : "OPEN_LOG_LOCAL",
 						filenames : [picked]
@@ -117,6 +121,7 @@ window.LogViewer = {
 				var remote_uri = $.trim($(remote_field).val());
 				// alert('picked_remote: ' + remote_uri);
 				if (remote_uri != "") {
+					this.clear_text_area();
 				    var open_log_msg = {
 			    	    action : "OPEN_LOG_REMOTE",
 			    	    filenames : [remote_uri],
@@ -143,6 +148,11 @@ window.LogViewer = {
 				if (!paused) {
 					this.update_text_area();
 				}
+			},
+
+			clear_text_area: function() {
+                log_data = "";
+                log_area.val(log_data);
 			},
 			
 			update_text_area : _.throttle(function() {
