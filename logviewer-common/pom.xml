@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.logviewer</groupId>
 		<artifactId>logviewer</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>logviewer-common</artifactId>
 	<packaging>jar</packaging>
@@ -108,13 +108,6 @@
 					<groupId>org.objenesis</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

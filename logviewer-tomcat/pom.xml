@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.logviewer</groupId>
 		<artifactId>logviewer</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>logviewer-tomcat</artifactId>
 	<packaging>jar</packaging>
@@ -26,7 +26,12 @@
 		<dependency>
 			<groupId>org.logviewer</groupId>
 			<artifactId>logviewer-common</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>0.0.4-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.logviewer</groupId>
+			<artifactId>logviewer-servlet</artifactId>
+			<version>0.0.4-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
