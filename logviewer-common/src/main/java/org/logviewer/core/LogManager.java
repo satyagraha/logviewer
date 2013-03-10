@@ -10,22 +10,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.logviewer.core.LogMessage.Action;
 import org.logviewer.tailer.LogTailerAbstract;
-import org.logviewer.tailer.LogTailerCommons;
-import org.logviewer.tailer.LogTailerSsh;
 import org.logviewer.tailer.TailerCallback;
-import org.logviewer.tailer.TailerSsh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.jcraft.jsch.JSch;
 
 /**
  * Provides log management capabilities.
@@ -36,11 +29,14 @@ public class LogManager implements TailerCallback {
     public static final String LOG_MANAGER_LOG_FILTER_KEY = "LogManager.logFilter";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
-    
+
     private final LogConfig logConfig;
     private final MessageSender messageSender;
-    
+    private final TailerFactory tailerFactory;
+
     private final ObjectMapper mapper = new ObjectMapper();
+
+    private LogTailerAbstract logTailer;
 
     /**
      * Constructor.
@@ -48,10 +44,15 @@ public class LogManager implements TailerCallback {
      * @param logConfig
      * @param messageSender
      */
-    public LogManager(LogConfig logConfig, MessageSender messageSender) {
+    public LogManager(LogConfig logConfig, MessageSender messageSender, TailerFactory tailerFactory) {
         LOGGER.debug("LogManager");
         this.logConfig = logConfig;
         this.messageSender = messageSender;
+        this.tailerFactory = tailerFactory;
+    }
+    
+    public LogManager(LogConfig logConfig, MessageSender messageSender) {
+       this(logConfig, messageSender, new TailerFactory(logConfig));
     }
 
     /**
@@ -79,17 +80,48 @@ public class LogManager implements TailerCallback {
             getLogFilenames();
             break;
         case OPEN_LOG_LOCAL:
-            openLogLocal(message.filenames.get(0));
+            openLogLocal(message);
             break;
         case OPEN_LOG_REMOTE:
-            openLogRemote(message.filenames.get(0), message.password, message.passphrase);
+            openLogRemote(message);
             break;
         case CLOSE_LOG:
-            closeLog();
+            close();
             break;
         default:
             LOGGER.error("unexpected message action");
         }
+    }
+
+    private void openLogLocal(LogMessage message) throws IOException {
+        String filename = message.filenames.get(0);
+        LOGGER.debug("filename: {}", filename);
+
+        File file = new File(getLogDir(), filename);
+        URI uriLocal;
+        try {
+            uriLocal = new URI("file", "///" + file.getAbsolutePath(), null);
+        } catch (URISyntaxException e) {
+            handleException(e);
+            throw new IOException(e);
+        }
+        logTailer = tailerFactory.logLocalTailer(uriLocal, this);
+        logTailer.start();
+    }
+
+    private void openLogRemote(LogMessage message) throws IOException {
+        String uri_string = message.filenames.get(0);
+        LOGGER.debug("uri_string: {}", uri_string);
+
+        URI uriRemote;
+        try {
+            uriRemote = new URI(uri_string);
+        } catch (URISyntaxException e) {
+            handleException(e);
+            throw new IOException(e);
+        }
+        logTailer = tailerFactory.logRemoteTailer(uriRemote, message.password, message.passphrase, this);
+        logTailer.start();
     }
 
     /*
@@ -144,58 +176,14 @@ public class LogManager implements TailerCallback {
         String logDir = logConfig.getProperties().getProperty(LOG_MANAGER_LOG_DIR_KEY);
         return new File(logDir);
     }
-    
+
     private WildcardFileFilter getLogFilter() {
         String logFilter = logConfig.getProperties().getProperty(LOG_MANAGER_LOG_FILTER_KEY);
         return new WildcardFileFilter(logFilter);
     }
-    
-    private LogTailerAbstract logTailer;
 
-    private void openLogLocal(String filename) throws IOException {
-        LOGGER.debug("filename: {}", filename);
-
-        File file = new File(getLogDir(), filename);
-        URI uri;
-        try {
-             uri = new URI("file", "///" + file.getAbsolutePath(), null);
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-        LOGGER.debug("uri: {}", uri);
-
-        logTailer = new LogTailerCommons(this, uri, logConfig.getExecutor());
-        logTailer.start();
-    }
-
-    private void openLogRemote(String uri_string, String password, String passphrase) throws IOException {
-        LOGGER.debug("uri_string: {}", uri_string);
-        
-        URI uri;
-        try {
-            uri = new URI(uri_string);
-        } catch (URISyntaxException e) {
-            handleException(e);
-            throw new IOException(e);
-        }
-        LOGGER.debug("uri: {}", uri);
-        
-        Properties properties = new Properties(logConfig.getProperties());
-        if (StringUtils.isNotEmpty(password)) {
-            properties.put(LogTailerSsh.LOG_TAILER_SSH_PASSWORD_KEY, password);
-        }
-        if (StringUtils.isNotEmpty(passphrase)) {
-            properties.put(LogTailerSsh.LOG_TAILER_SSH_PASSPHRASE_KEY, passphrase);
-        }
-
-        JSch jsch = new JSch();
-        TailerSsh tailer = new TailerSsh(jsch, uri, this, logConfig.getExecutor());
-        logTailer = new LogTailerSsh(this, uri, logConfig.getExecutor(), properties, tailer);
-        logTailer.start();
-    }
-    
-    private void closeLog() {
-        LOGGER.debug("closeLog");
+    public void close() {
+        LOGGER.debug("close");
         if (logTailer != null) {
             logTailer.stop();
         }
