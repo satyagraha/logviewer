@@ -5,10 +5,11 @@ import java.net.URI;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.logviewer.services.LogConfig;
+import org.logviewer.services.TailerCallback;
 import org.logviewer.tailer.LogTailerAbstract;
 import org.logviewer.tailer.LogTailerCommons;
 import org.logviewer.tailer.LogTailerSsh;
-import org.logviewer.tailer.TailerCallback;
 import org.logviewer.tailer.TailerSsh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.logviewer.core;
+package org.logviewer.services;
 
 import java.io.IOException;
 

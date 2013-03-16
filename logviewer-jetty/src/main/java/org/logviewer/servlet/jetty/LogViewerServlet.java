@@ -6,9 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketServlet;
-import org.logviewer.core.LogConfig;
 import org.logviewer.core.LogManager;
-import org.logviewer.core.MessageSender;
+import org.logviewer.services.LogConfig;
+import org.logviewer.services.MessageSender;
 import org.logviewer.servlet.LogConfigDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

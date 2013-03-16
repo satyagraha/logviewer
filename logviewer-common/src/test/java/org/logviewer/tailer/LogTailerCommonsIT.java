@@ -1,4 +1,4 @@
-package org.logviewer.core;
+package org.logviewer.tailer;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -14,8 +14,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
+import org.logviewer.services.TailerCallback;
 import org.logviewer.tailer.LogTailerCommons;
-import org.logviewer.tailer.TailerCallback;
 import org.logviewer.utility.DaemonThreadFactory;
 
 public class LogTailerCommonsIT {

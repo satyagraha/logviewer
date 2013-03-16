@@ -1,4 +1,4 @@
-package org.logviewer.tailer;
+package org.logviewer.services;
 
 /**
  * Handle tailer callback events. 
@@ -10,13 +10,13 @@ public interface TailerCallback {
      * 
      * @param line
      */
-    public abstract void handleLine(String line);
+    public void handleLine(String line);
 
     /**
      * Process tailer exception.
      * 
      * @param e
      */
-    public abstract void handleException(Exception e);
+    public void handleException(Exception e);
 
 }

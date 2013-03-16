@@ -3,11 +3,14 @@ package org.logviewer.tailer;
 import java.net.URI;
 import java.util.concurrent.Executor;
 
+import org.logviewer.services.LogTailer;
+import org.logviewer.services.TailerCallback;
+
 /**
  * Declares essential tailer facilities. 
  *
  */
-public abstract class LogTailerAbstract {
+public abstract class LogTailerAbstract implements LogTailer {
     
     protected final TailerCallback tailerCallback;
     protected final URI uri;
@@ -26,14 +29,4 @@ public abstract class LogTailerAbstract {
         this.executor = executor;
     }
 
-    /**
-     * Commence log tailing.
-     */
-    public abstract void start();
-    
-    /**
-     * Cease log tailing.
-     */
-    public abstract void stop();
-    
 }

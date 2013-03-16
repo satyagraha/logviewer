@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.logviewer.core.LogManagerTest;
+import org.logviewer.services.TailerCallback;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.jcraft.jsch.JSch;
@@ -31,7 +31,7 @@ public class LogTailerSshTest {
     public void shouldInitialiseJsch() throws IOException, URISyntaxException, JSchException {
         
         // given
-        File pkFile = new File(LogManagerTest.class.getClassLoader().getResource("test_private_key.ossh").toURI());
+        File pkFile = new File(LogTailerSshTest.class.getClassLoader().getResource("test_private_key.ossh").toURI());
         String pkFilePath = pkFile.getCanonicalPath();
         given(properties.getProperty(LogTailerSsh.LOG_TAILER_SSH_PRIVATE_KEY_FILE_PATH_KEY)).willReturn(pkFilePath);
         String passphrase = "ok!";

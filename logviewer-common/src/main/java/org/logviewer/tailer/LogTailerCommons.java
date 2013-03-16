@@ -6,6 +6,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListenerAdapter;
+import org.logviewer.services.TailerCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

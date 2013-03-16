@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import org.logviewer.services.TailerCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +29,6 @@ public class LogTailerSsh extends LogTailerAbstract {
         super(tailerCallback, uri, executor);
         this.tailer = tailer;
         
-//        String path = uri.getPath();
-//        LOGGER.debug("path: {}", path);
-//        File file = new File(path);
-//        LOGGER.debug("file: {}", file);
-
         String privateKeyFilePath = properties.getProperty(LOG_TAILER_SSH_PRIVATE_KEY_FILE_PATH_KEY);
         LOGGER.debug("privateKeyFilePath: {}", privateKeyFilePath);
         

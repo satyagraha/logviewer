@@ -5,7 +5,7 @@ import java.util.concurrent.Executor;
 
 import javax.servlet.GenericServlet;
 
-import org.logviewer.core.LogConfig;
+import org.logviewer.services.LogConfig;
 import org.logviewer.utility.LogConfigProperties;
 
 public class LogConfigDefault implements LogConfig {

@@ -15,8 +15,10 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.logviewer.core.LogMessage.Action;
-import org.logviewer.tailer.LogTailerAbstract;
-import org.logviewer.tailer.TailerCallback;
+import org.logviewer.services.LogConfig;
+import org.logviewer.services.LogTailer;
+import org.logviewer.services.MessageSender;
+import org.logviewer.services.TailerCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,7 @@ public class LogManager implements TailerCallback {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private LogTailerAbstract logTailer;
+    private LogTailer logTailer;
 
     /**
      * Constructor.
@@ -110,12 +112,12 @@ public class LogManager implements TailerCallback {
     }
 
     private void openLogRemote(LogMessage message) throws IOException {
-        String uri_string = message.filenames.get(0);
-        LOGGER.debug("uri_string: {}", uri_string);
+        String uriString = message.filenames.get(0);
+        LOGGER.debug("uriString: {}", uriString);
 
         URI uriRemote;
         try {
-            uriRemote = new URI(uri_string);
+            uriRemote = new URI(uriString);
         } catch (URISyntaxException e) {
             handleException(e);
             throw new IOException(e);
