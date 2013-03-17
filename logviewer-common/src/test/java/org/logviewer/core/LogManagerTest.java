@@ -22,8 +22,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.logviewer.core.LogMessage.Action;
 import org.logviewer.services.LogConfig;
+import org.logviewer.services.LogTailer;
 import org.logviewer.services.MessageSender;
-import org.logviewer.tailer.LogTailerAbstract;
+import org.logviewer.tailer.TailerFactory;
 import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -80,7 +81,7 @@ public class LogManagerTest {
         Executor executor = mock(Executor.class);
         given(logConfig.getExecutor()).willReturn(executor);
 
-        LogTailerAbstract tailer = mock(LogTailerAbstract.class);
+        LogTailer tailer = mock(LogTailer.class);
         given(tailerFactory.logLocalTailer(any(URI.class), eq(logManager))).willReturn(tailer);
 
         // when
@@ -118,7 +119,7 @@ public class LogManagerTest {
         String passphrase = "let me in";
         String openLogRemoteMessage = makeOpenLogRemoteMessage(uriString, password, passphrase);
         
-        LogTailerAbstract tailer = mock(LogTailerAbstract.class);
+        LogTailer tailer = mock(LogTailer.class);
         given(tailerFactory.logRemoteTailer(any(URI.class), eq(password), eq(passphrase), eq(logManager))).willReturn(tailer);
         
         // when

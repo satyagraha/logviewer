@@ -19,6 +19,7 @@ import org.logviewer.services.LogConfig;
 import org.logviewer.services.LogTailer;
 import org.logviewer.services.MessageSender;
 import org.logviewer.services.TailerCallback;
+import org.logviewer.tailer.TailerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

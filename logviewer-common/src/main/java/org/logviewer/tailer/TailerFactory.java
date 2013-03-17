@@ -1,4 +1,4 @@
-package org.logviewer.core;
+package org.logviewer.tailer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -6,11 +6,8 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.logviewer.services.LogConfig;
+import org.logviewer.services.LogTailer;
 import org.logviewer.services.TailerCallback;
-import org.logviewer.tailer.LogTailerAbstract;
-import org.logviewer.tailer.LogTailerCommons;
-import org.logviewer.tailer.LogTailerSsh;
-import org.logviewer.tailer.TailerSsh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,13 +23,13 @@ public class TailerFactory {
         this.logConfig = logConfig;
     }
 
-    public LogTailerAbstract logLocalTailer(URI uri, TailerCallback listener) throws IOException {
+    public LogTailer logLocalTailer(URI uri, TailerCallback listener) throws IOException {
         LOGGER.debug("uri: {}", uri);
 
         return new LogTailerCommons(listener, uri, logConfig.getExecutor());
     }
 
-    public LogTailerAbstract logRemoteTailer(URI uri, String password, String passphrase, TailerCallback listener) throws IOException {
+    public LogTailer logRemoteTailer(URI uri, String password, String passphrase, TailerCallback listener) throws IOException {
         LOGGER.debug("uri: {}", uri);
 
         Properties properties = new Properties(logConfig.getProperties());

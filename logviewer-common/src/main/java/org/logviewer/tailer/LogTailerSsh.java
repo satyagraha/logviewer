@@ -32,16 +32,18 @@ public class LogTailerSsh extends LogTailerAbstract {
         String privateKeyFilePath = properties.getProperty(LOG_TAILER_SSH_PRIVATE_KEY_FILE_PATH_KEY);
         LOGGER.debug("privateKeyFilePath: {}", privateKeyFilePath);
         
-        String passphrase = properties.getProperty(LOG_TAILER_SSH_PASSPHRASE_KEY);
-        LOGGER.debug("passphrase found: {}", passphrase != null);
-        try {
-            if (passphrase != null) {
-                tailer.getJsch().addIdentity(privateKeyFilePath, passphrase);
-            } else {
-                tailer.getJsch().addIdentity(privateKeyFilePath);
+        if (privateKeyFilePath != null) {
+            String passphrase = properties.getProperty(LOG_TAILER_SSH_PASSPHRASE_KEY);
+            LOGGER.debug("passphrase found: {}", passphrase != null);
+            try {
+                if (passphrase != null) {
+                    tailer.getJsch().addIdentity(privateKeyFilePath, passphrase);
+                } else {
+                    tailer.getJsch().addIdentity(privateKeyFilePath);
+                }
+            } catch (JSchException e) {
+                throw new IOException(e);
             }
-        } catch (JSchException e) {
-            throw new IOException(e);
         }
         
         String password = properties.getProperty(LOG_TAILER_SSH_PASSWORD_KEY);
