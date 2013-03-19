@@ -9,7 +9,7 @@ import org.eclipse.jetty.websocket.WebSocketServlet;
 import org.logviewer.core.LogManager;
 import org.logviewer.services.LogConfig;
 import org.logviewer.services.MessageSender;
-import org.logviewer.servlet.LogConfigDefault;
+import org.logviewer.servlet.LogConfigServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ public class LogViewerServlet extends WebSocketServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogViewerServlet.class);
     
-    private final LogConfig logConfig = new LogConfigDefault(this);
+    private final LogConfig logConfig = new LogConfigServlet(this);
 
     private class LogMessageWebSocket implements WebSocket, WebSocket.OnTextMessage, MessageSender {
 

@@ -8,11 +8,12 @@ import javax.servlet.GenericServlet;
 import org.logviewer.services.LogConfig;
 import org.logviewer.utility.LogConfigProperties;
 
-public class LogConfigDefault implements LogConfig {
+public class LogConfigServlet implements LogConfig {
 
     private final GenericServlet servlet;
+    private final static Properties properties = new LogConfigProperties(); 
 
-    public LogConfigDefault(GenericServlet servlet) {
+    public LogConfigServlet(GenericServlet servlet) {
         this.servlet = servlet;
     }
     
@@ -23,7 +24,7 @@ public class LogConfigDefault implements LogConfig {
     
     @Override
     public Properties getProperties() {
-        return new LogConfigProperties();
+        return properties;
     }
 
 }
