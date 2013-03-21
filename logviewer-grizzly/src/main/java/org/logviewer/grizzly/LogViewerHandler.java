@@ -8,8 +8,12 @@ import org.glassfish.grizzly.websockets.WebSocketAdapter;
 import org.logviewer.core.LogManager;
 import org.logviewer.services.LogConfig;
 import org.logviewer.services.MessageSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LogViewerHandler extends WebSocketAdapter implements MessageSender {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogViewerHandler.class);
     
     private WebSocket socket;
     private LogManager logManager;
@@ -22,7 +26,7 @@ public class LogViewerHandler extends WebSocketAdapter implements MessageSender 
 
     @Override
     public void onMessage(WebSocket socket, String messageText) {
-        System.out.println("LVH onMessage: " + messageText);
+        LOGGER.debug("onMessage: {}", messageText);
         try {
             logManager.handleMessage(messageText);
         } catch (IOException e) {
@@ -32,7 +36,7 @@ public class LogViewerHandler extends WebSocketAdapter implements MessageSender 
     
     @Override
     public void onClose(WebSocket socket, DataFrame frame) {
-        System.out.println("LVH onClose");
+        LOGGER.debug("onClose: {}", socket);
         socket.remove(this);
         logManager.close();
         socket = null;
@@ -41,6 +45,7 @@ public class LogViewerHandler extends WebSocketAdapter implements MessageSender 
     
     @Override
     public void sendMessage(String messageString) throws IOException {
+        LOGGER.debug("sendMessage: {}", messageString);
         if (socket != null) {
             socket.send(messageString);
         }

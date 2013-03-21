@@ -9,11 +9,17 @@ import org.glassfish.grizzly.websockets.WebSocketAddOn;
 import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.logviewer.services.LogConfig;
 import org.logviewer.utility.LogConfigDefault;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LogViewerHttpServer extends HttpServer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogViewerHttpServer.class);
+    
     public LogViewerHttpServer() {
         super();
+
+        LOGGER.info("commencing execution");
         
         LogConfig logConfig = new LogConfigDefault();
         

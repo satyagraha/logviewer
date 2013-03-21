@@ -29,11 +29,26 @@
 		</repository>
 	</repositories>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mvnplugins.fusesource.org</id>
+			<url>http://mvnplugins.fusesource.org/repo/release</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
@@ -110,14 +125,8 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.10</version>
+				<version>4.11</version>
 				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<artifactId>hamcrest-core</artifactId>
-						<groupId>org.hamcrest</groupId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
@@ -159,6 +168,20 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
+										<groupId>org.fusesource.mvnplugins</groupId>
+										<artifactId>maven-graph-plugin</artifactId>
+										<versionRange>[1.0,)</versionRange>
+										<goals>
+											<goal>project</goal>
+											<goal>reactor</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
 										<artifactId>maven-enforcer-plugin</artifactId>
 										<versionRange>[1.0,)</versionRange>
@@ -167,7 +190,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -180,7 +203,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -190,6 +213,32 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.fusesource.mvnplugins</groupId>
+				<artifactId>maven-graph-plugin</artifactId>
+				<version>1.29</version>
+				<configuration>
+					<target>${project.build.directory}/${project.artifactId}-dependencies.dot</target>
+				</configuration>
+				<executions>
+					<execution>
+						<id>validate-graph-project</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>project</goal>
+						</goals>
+						<inherited>true</inherited>
+					</execution>
+					<execution>
+						<id>validate-graph-reactor</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>reactor</goal>
+						</goals>
+						<inherited>false</inherited>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>

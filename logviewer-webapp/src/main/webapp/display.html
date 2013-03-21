@@ -1,11 +1,11 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <head>
-<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Log File Viewer</title>
 
-<script src="scripts/jquery-1.7.2.js"></script>
-<script src="scripts/jquery.json-2.3.js"></script>
-<script src="scripts/underscore-1.4.1.js"></script>
+<script type="text/javascript" src="scripts/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="scripts/jquery.json-2.3.js"></script>
+<script type="text/javascript" src="scripts/underscore-1.4.1.js"></script>
 
 <script language="javascript" type="text/javascript">
 
@@ -14,7 +14,7 @@ window.LogViewer = {
 	on_ready : function() {
 		// alert('ready')
 		if (typeof(WebSocket) != "function" ) {
-    		$('body').html("<h1>Error</h1><p>Your browser does not support HTML5 Web Sockets.</p>");
+    		$('body').html("Error: Your browser does not support HTML5 Web Sockets.");
     		return;
   		}
 		
@@ -97,7 +97,7 @@ window.LogViewer = {
 				// alert('filenames: ' + filenames);
 				$(dir_field).val(directory);
 				filenames.forEach(function (filename) {
-					var html = '<option>_</option>'.replace('_', filename); 
+					var html = '<option>_<\/option>'.replace('_', filename); 
 					$(html).appendTo(select);
 				});
 			},
@@ -186,12 +186,12 @@ $(document).ready(window.LogViewer.on_ready);
 </head>
 <body>
     <h1>Log File Viewer</h1>
-	<form>
+	<form action="">
 		<fieldset>
 			<legend><b>Local</b></legend>
 			<label for="dir_field">Log Dir:</label>
 	    	<input id="dir_field" size="40" readonly="true"/>
-			<select id="pick_log_file"">
+			<select id="pick_log_file">
 				<option>pick log file</option>
 			</select>
 		</fieldset>
