@@ -17,6 +17,10 @@ import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+/**
+ * Provides a basic integration test of log viewer.
+ *
+ */
 public class LogViewerServerST {
 
     private static WebDriver driver;

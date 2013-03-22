@@ -11,6 +11,10 @@ import org.logviewer.services.MessageSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides websocket event handling and message transmission.
+ *
+ */
 public class LogViewerHandler extends WebSocketAdapter implements MessageSender {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(LogViewerHandler.class);
@@ -18,12 +22,21 @@ public class LogViewerHandler extends WebSocketAdapter implements MessageSender 
     private WebSocket socket;
     private LogManager logManager;
 
+    /**
+     * Constructor.
+     * 
+     * @param logConfig
+     * @param socket
+     */
     public LogViewerHandler(LogConfig logConfig, WebSocket socket) {
         this.socket = socket;
         logManager = new LogManager(logConfig, this);
         socket.add(this);
     }
 
+    /* (non-Javadoc)
+     * @see org.glassfish.grizzly.websockets.WebSocketAdapter#onMessage(org.glassfish.grizzly.websockets.WebSocket, java.lang.String)
+     */
     @Override
     public void onMessage(WebSocket socket, String messageText) {
         LOGGER.debug("onMessage: {}", messageText);
@@ -34,6 +47,9 @@ public class LogViewerHandler extends WebSocketAdapter implements MessageSender 
         }
     }
     
+    /* (non-Javadoc)
+     * @see org.glassfish.grizzly.websockets.WebSocketAdapter#onClose(org.glassfish.grizzly.websockets.WebSocket, org.glassfish.grizzly.websockets.DataFrame)
+     */
     @Override
     public void onClose(WebSocket socket, DataFrame frame) {
         LOGGER.debug("onClose: {}", socket);
@@ -43,6 +59,9 @@ public class LogViewerHandler extends WebSocketAdapter implements MessageSender 
         logManager = null;
     }
     
+    /* (non-Javadoc)
+     * @see org.logviewer.services.MessageSender#sendMessage(java.lang.String)
+     */
     @Override
     public void sendMessage(String messageString) throws IOException {
         LOGGER.debug("sendMessage: {}", messageString);

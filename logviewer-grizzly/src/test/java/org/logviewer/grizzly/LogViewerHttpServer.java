@@ -16,6 +16,9 @@ public class LogViewerHttpServer extends HttpServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogViewerHttpServer.class);
     
+    /**
+     * Constructor.
+     */
     public LogViewerHttpServer() {
         super();
 
@@ -26,6 +29,7 @@ public class LogViewerHttpServer extends HttpServer {
         NetworkListener networkListener = new NetworkListener("sample-listener", "localhost", 8080);
         addListener(networkListener);
                 
+        // a rather messy way to access the main display file.
         String contentPath = "../logviewer-webapp/src/main/webapp";
         getServerConfiguration().addHttpHandler(new StaticHttpHandler(contentPath ), "/logviewer");
         
@@ -39,6 +43,8 @@ public class LogViewerHttpServer extends HttpServer {
     }
     
     /**
+     * starts web server.
+     * 
      * @param args
      * @throws IOException 
      */

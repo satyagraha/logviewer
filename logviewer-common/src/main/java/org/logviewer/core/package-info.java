@@ -1,5 +1,5 @@
 /**
- * Principal classes.
+ * Principal implementation classes.
  */
 package org.logviewer.core;
 

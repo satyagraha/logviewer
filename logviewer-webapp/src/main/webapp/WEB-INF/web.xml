@@ -15,7 +15,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>LogViewerServlet</servlet-name>
-		<url-pattern>/websocket/support</url-pattern>
+		<url-pattern>/websocket</url-pattern>
 	</servlet-mapping>
 
 	<context-param>

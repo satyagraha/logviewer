@@ -20,10 +20,13 @@ public class ExecutorContextListener implements ServletContextListener {
     
     private ExecutorService executor;
 
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+     */
     @Override
-    public void contextInitialized(ServletContextEvent arg0) {
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
         LOGGER.debug("contextInitialized");
-        ServletContext context = arg0.getServletContext();
+        ServletContext context = servletContextEvent.getServletContext();
         int executors = 1;
         ThreadFactory daemonFactory = new DaemonThreadFactory();
         try {
@@ -40,8 +43,11 @@ public class ExecutorContextListener implements ServletContextListener {
         context.setAttribute("executor", executor);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+     */
     @Override
-    public void contextDestroyed(ServletContextEvent arg0) {
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
         LOGGER.debug("contextDestroyed");
         executor.shutdownNow();
     }
