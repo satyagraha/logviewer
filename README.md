@@ -5,7 +5,7 @@
 This project provides a capability to tail log files in a web browser. It uses the emerging 
 [websockets](http://en.wikipedia.org/wiki/WebSocket) technology to stream new log lines to the browser for 
 display in a scrollable text area. The log files tailed may be either on a filesystem locally mounted on 
-the web application server, or be remotely accessible via ssh.
+the web application server, or on a remote server accessible via [ssh](http://en.wikipedia.org/wiki/Secure_Shell).
 
 ### Browser Compatibility
 
@@ -20,17 +20,21 @@ A comprehensive table of browser websocket support is [here](http://caniuse.com/
 
 ### Server-side Support
 
-The server-side implementation of websockets does not as yet have a standard Java servlet API. Therefore
+The server-side implementation of websockets does not as yet have a standard Java API. Therefore
 different web container providers require the use of container-specific classes to service websocket
 actions.
 
 The implementation provided here comes with:
 
-- a common core which is independent of the container
-- a Tomcat 7.0.30 servlet adapter using the common core
-- a Jetty 7.6.7 servlet adapter using the common core
+- a common core log viewer service which is independent of the container
+- a common [J2EE servlet](http://en.wikipedia.org/wiki/Java_Servlet) 2.5 abstraction module
+- an [Apache Tomcat](http://tomcat.apache.org/) 7.0.30 servlet adapter using the two common modules
+- a [codehaus Jetty](http://jetty.codehaus.org/jetty/) 7.6.7 servlet adapter using the two common modules
+- a [Glassfish Grizzly](http://grizzly.java.net/) implementation using the common core service only
 
-There is no reason these could not be further extended to other J2EE containers without too much difficulty.
+A separate [Play framework](http://www.playframework.com/) project using the common core is available [here]().
+
+There is no reason implementations could not be provided for other containers without too much difficulty.
   
 ## Getting Started
  
@@ -44,12 +48,15 @@ directory if required
  - `set JAVA_HOME=C:\Program Files\Java\jdk1.6.0_35`
 - Build the complete system thus:
  - `mvn.bat clean install`
-- Change to the webapp module directory thus:
- - `cd logviewer-webapp` 
 - For Jetty, execute:
+  - `cd logviewer-webapp`
   - `mvn.bat -P jetty clean jetty:run`
 - For Tomcat, execute:
+ - `cd logviewer-webapp`
  - `mvn.bat -P tomcat clean tomcat7:run`
+- For Grizzly, execute:
+ - `cd logviewer-grizzly`
+ - `mvn.bat exec:java` 
 - Open web URL [http://localhost:8080/logviewer/display.html](http://localhost:8080/logviewer/display.html)
 - The resulting web page should be visible in the usual way
 
@@ -122,8 +129,13 @@ which generates 100 lines of output then exits. Omit the line limit number to ma
 - Developer contributions welcome
 - Credit is due to JCraft Inc, developers of the [Jsch Java SSH library](http://www.jcraft.com/jsch/)
 
+## License
+
+[Apache V2.0](http://www.apache.org/licenses/)
+
 ## Revision History
 
+- 0.0.4 - Refactored and added Grizzly support
 - 0.0.3 - Added ssh support
 - 0.0.2 - Split into separate maven modules
 - 0.0.1 - Initial version
