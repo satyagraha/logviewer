@@ -10,7 +10,8 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<jetty-version>7.6.7.v20120910</jetty-version>
+		<jetty-version>9.2.10.v20150310</jetty-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
@@ -38,20 +39,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-websocket</artifactId>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-servlet</artifactId>
 			<version>${jetty-version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>2.5.0.v201103041518</version>
-        </dependency>
+
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-api</artifactId>
 			<version>${jetty-version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
