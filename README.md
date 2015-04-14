@@ -135,6 +135,7 @@ which generates 100 lines of output then exits. Omit the line limit number to ma
 
 ## Revision History
 
+- 0.0.5 - Support for Jetty 9.2.x
 - 0.0.4 - Refactored and added Grizzly support
 - 0.0.3 - Added ssh support
 - 0.0.2 - Split into separate maven modules
